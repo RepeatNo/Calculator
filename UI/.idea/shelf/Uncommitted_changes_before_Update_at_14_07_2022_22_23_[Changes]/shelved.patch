@@ -1,0 +1,99 @@
+Index: ../Implementation/src/main/java/at/adesso/calculator/services/CalculatorService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package at.adesso.calculator.services;\r\n\r\nimport at.adesso.calculator.Calculator;\r\nimport at.adesso.calculator.CalculatorImpl;\r\nimport at.adesso.calculator.DivisionByZeroException;\r\nimport org.springframework.stereotype.Component;\r\nimport org.springframework.stereotype.Service;\r\n\r\n@Service\r\npublic class CalculatorService implements Calculator {\r\n\r\n    private CalculatorImpl calculator;\r\n\r\n    public CalculatorService(CalculatorImpl calculator) {\r\n        this.calculator = calculator;\r\n    }\r\n\r\n    public Float add(Float x, Float y) {\r\n        return calculator.add(x, y);\r\n    }\r\n\r\n    public Float subtract(Float x, Float y) {\r\n        return calculator.subtract(x, y);\r\n    }\r\n\r\n    public Float multiply(Float x, Float y) {\r\n        return calculator.multiply(x, y);\r\n    }\r\n\r\n    public Float divide(Float x, Float y) throws DivisionByZeroException {\r\n        return calculator.divide(x, y);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../Implementation/src/main/java/at/adesso/calculator/services/CalculatorService.java b/../Implementation/src/main/java/at/adesso/calculator/services/CalculatorService.java
+--- a/../Implementation/src/main/java/at/adesso/calculator/services/CalculatorService.java	
++++ b/../Implementation/src/main/java/at/adesso/calculator/services/CalculatorService.java	
+@@ -3,31 +3,63 @@
+ import at.adesso.calculator.Calculator;
+ import at.adesso.calculator.CalculatorImpl;
+ import at.adesso.calculator.DivisionByZeroException;
+-import org.springframework.stereotype.Component;
++import at.adesso.calculator.entities.CalculationOperationLog;
++import at.adesso.calculator.entities.LoggingType;
++import at.adesso.calculator.entities.OperationType;
++import at.adesso.calculator.repositories.CalculationOperationLogRepository;
+ import org.springframework.stereotype.Service;
+ 
++import java.util.Date;
++
+ @Service
+ public class CalculatorService implements Calculator {
+ 
+-    private CalculatorImpl calculator;
++    private final CalculatorImpl calculator;
+ 
+-    public CalculatorService(CalculatorImpl calculator) {
++    private final CalculationOperationLogRepository calculationOperationLogRepository;
++
++    public CalculatorService(CalculatorImpl calculator, CalculationOperationLogRepository calculationOperationLogRepository) {
+         this.calculator = calculator;
++        this.calculationOperationLogRepository = calculationOperationLogRepository;
+     }
+ 
+     public Float add(Float x, Float y) {
+-        return calculator.add(x, y);
++        Float result = calculator.add(x, y);
++        Log(x, y, result, OperationType.ADD, LoggingType.INFO);
++        return result;
+     }
+ 
+     public Float subtract(Float x, Float y) {
+-        return calculator.subtract(x, y);
++        Float result = calculator.subtract(x, y);
++        Log(x, y, result, OperationType.SUBTRACT, LoggingType.INFO);
++        return result;
+     }
+ 
+     public Float multiply(Float x, Float y) {
+-        return calculator.multiply(x, y);
++        Float result = calculator.multiply(x, y);
++        Log(x, y, result, OperationType.MULTIPLY, LoggingType.INFO);
++        return result;
+     }
+ 
+-    public Float divide(Float x, Float y) throws DivisionByZeroException {
+-        return calculator.divide(x, y);
++    public Float divide(Float x, Float y) {
++        try {
++            Float result = calculator.divide(x, y);
++            Log(x, y, result, OperationType.DIVIDE, LoggingType.INFO);
++            return result;
++        } catch (Exception exception) {
++            Log(x, y, null, OperationType.DIVIDE, LoggingType.ERROR);
++        }
++        return null;
++    }
++
++    private void Log(Float input1, Float input2, Float result, OperationType operationType, LoggingType loggingType) {
++        CalculationOperationLog log = new CalculationOperationLog();
++        log.setDate(new Date());
++        log.setInput1(input1);
++        log.setInput2(input2);
++        log.setResult(result);
++        log.setLoggingType(loggingType);
++        log.setOperationType(operationType);
++        calculationOperationLogRepository.save(log);
+     }
+ }
+Index: ../Implementation/src/main/java/at/adesso/calculator/repositories/CalculationOperationLogRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../Implementation/src/main/java/at/adesso/calculator/repositories/CalculationOperationLogRepository.java b/../Implementation/src/main/java/at/adesso/calculator/repositories/CalculationOperationLogRepository.java
+new file mode 100644
+--- /dev/null	
++++ b/../Implementation/src/main/java/at/adesso/calculator/repositories/CalculationOperationLogRepository.java	
+@@ -0,0 +1,7 @@
++package at.adesso.calculator.repositories;
++
++import at.adesso.calculator.entities.CalculationOperationLog;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++public interface CalculationOperationLogRepository extends JpaRepository<CalculationOperationLog, Long> {
++}
