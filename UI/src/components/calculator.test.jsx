@@ -126,9 +126,29 @@ it('error -> clear', async () => {
 
     expect(calculator.concatResult()).toEqual("Division by zero")
     
+    console.log("result", calculator.state.result);
+    console.log("x", calculator.state.result.x);
+    console.log("error", calculator.state.result.error);
+
     calculator.state.result.error = "";
+    console.log(calculator.state.result.operator);
+    expect(calculator.state.result.x).toEqual("");
+    expect(calculator.state.result.y).toEqual("");
+    calculator.handleNumber("1");
+    expect(calculator.state.result.x).toEqual("1");
+    expect(calculator.state.result.operator).toEqual("");
+    expect(calculator.state.result.y).toEqual("");
+
+    calculator.state.result.x = ""
 
     expect(calculator.concatResult()).toEqual("???")
-
-
 });
+
+/*it('decimal numbers impl', async () => {
+    let calculator = TestRenderer.create(<Calculator />).getInstance();
+    let { x, y, operator, value, error } = calculator.state.result;
+
+    calculator.handleComma();
+
+    expect(x).toEqual("0.")
+})*/
