@@ -1,4 +1,4 @@
-### Calculator
+### Simple Calculator
 
 Goals: 
 	- Learn React
