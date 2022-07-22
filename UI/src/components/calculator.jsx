@@ -5,40 +5,43 @@ import NumberField from './Fields/numberField.jsx';
 import ClearField from './Fields/clearField.jsx';
 import EvaluationField from './Fields/evaluationField.jsx';
 import CommaField from './Fields/commaField.jsx';
+import SignField from './Fields/signField.jsx';
 
 class Calculator extends Component {
     state = {
-        result: {
-            x: '',
-            y: '',
-            operator: '',
-            value: '',
-            error: ''
-        }
+        x: { sign: '+', value: '' },
+        y: { sign: '+', value: '' },
+        operator: '',
+        result: { sign: '+', value: '' },
+        error: ''
     };
 
-    concatResult = () => {
-        const resultString = ((this.state.result.x !== '') ? this.state.result.x : '')
-            + ((this.state.result.operator !== '') ? " " + this.state.result.operator + ' ' : '')
-            + ((this.state.result.y !== '') ? this.state.result.y : '');
+    dynamicDisplay = () => {
+        let { x, y, operator, error, result } = this.state;
+
+        const dynamicString = (
+            ((x.value !== '')  ? ((x.sign !== '+') ? x.sign : '') + x.value : '') +
+            ((operator !== '') ? " " + operator + ' ' : '') +
+            ((y.value !== '')  ? ((y.sign !== '+') ? y.sign : '') + y.value : '')
+        );
         
-        if (this.state.result.error != '')
-            return this.state.result.error;
+        if (error != '')
+            return error;
         
-        if (this.state.result.value != '')
-            return this.state.result.value;
+        if (result.value != '')
+            return ((result.sign !== '+') ? result.sign : '') + result.value;
         
-        if (resultString === '')
+        if (dynamicString === '')
             return '???';
         
-        return resultString;
+        return dynamicString;
     };
 
     render() {
         return (
             <div className="container w-50 text-center ">
                 <div className="row">
-                    <ResultField displayData={this.concatResult()} />
+                    <ResultField displayData={this.dynamicDisplay()} />
                 </div>
                 <div className="row">
                     <NumberField value={7} onNumber={this.handleNumber} />
@@ -65,138 +68,172 @@ class Calculator extends Component {
                     <EvaluationField value={'='} onEvaluation={this.handleEvaluation} />
                 </div>
                 <div className="row">
-                    <div className="col-3"></div>
-                    <div className="col-3"></div>
-                    <div className="col-3"></div>
+                    <div className="col-9"></div>
+                    <SignField value={'+/-'} onSignChange={this.handleSignChange} />
                     <CommaField value={'.'} onComma={this.handleComma} />
                 </div>
             </div>
         );
     };
 
-    handleComma = () => {
-        let { x, y, operator, value, error } = this.state.result; 
+    handleSignChange = () => {
+        let { x, y, operator, result } = this.state;
 
-        if (y == '' && operator == '')
-            x += x + '.';
+        if (result.value !== '') {
+            x = result;
+        }
+
+        if (y.value === '' && operator === '') {
+            x.sign = (x.sign === '+') ? '-' : '+';
+        }
+
+        if (operator !== '' && y.value !== '') {
+            y.sign = (y.sign === '+') ? '-' : '+';
+        }
+
+        this.setState({ x, y });        
+    };
+
+    handleComma = () => {
+        let state = this.state;
+
+        if (state.result.value !== '') {
+            state.x = state.result;
+            state.result = { sign: '+', value: '' };
+        }
+
+        if (state.y.value == '' && state.operator == '' && !state.x.value.includes("."))
+            state.x.value += '.';
+        else {
+            if (state.x.value !== '' && state.operator !== '' && !state.y.value.includes(".")) {
+                state.y.value += '.'
+            }
+        }
+        
+        this.setState(state);
     }
 
     handleClear = () => {
         this.setState({
-            result: {
-                x: '',
-                y: '',
-                operator: '',
-                value: '',
-                error: ''
-            }
+            x: { sign: '+', value: '' },
+            y: { sign: '+', value: '' },
+            operator: '',
+            result: { sign: '+', value: '' },
+            error: ''
         });
     };
 
-    returnEmptyResult = () => {
+    returnEmptyStates = () => {
         return {
-            x: '',
-            y: '',
+            x: { sign: '+', value: '' },
+            y: { sign: '+', value: '' },
             operator: '',
-            value: '',
+            result: { sign: '+', value: '' },
             error: ''
-            
         }
     };
 
     handleNumber = (number) => {
-        let result = this.state.result;
-        if (result.error !== '') {
-            result.error = '';
-        }
-        
-        if (result.x === '' && result.operator === '') {
-            if (result.x === '0' && number === 0)
-                return;
-            
-            if (result.x === '0' && number !== 0) {
-                result.x = '' + number;
-                this.setState({ result });
-                return;
-            }
-            
-            result.x += '' + number;
-            this.setState({ result });
-        } else {
-            if (result.y === '0' && number === 0)
-                return;
-            
-            if (result.y === '0' && number !== 0) {
-                result.x = '' + number;
-                this.setState({ result });
-                return;
-            }
-            
-            result.y += '' + number;
-            this.setState({ result });
+        let { x, y, operator, error, result } = this.state;
+
+        if (error !== '') {
+            error = '';
+            this.setState({ error });
         }
 
-      
+        if (result !== '') {
+            result.value = '';
+            result.sign = '+';
+            this.setState({ result });
+        }
+        
+        if (y.value === '' && operator === '') {
+            if (x.value === '0' && number === 0)
+                return;
+            
+            if (x.value === '0' && number !== 0) {
+                x.value = '' + number;
+                this.setState({ x });
+                return;
+            }
+            
+            x.value += '' + number;
+            this.setState({ x });
+        } else {
+            if (y.value === '0' && number === 0)
+                return;
+            
+            if (y.value === '0' && number !== 0) {
+                x.value = '' + number;
+                this.setState({ x });
+                return;
+            }
+            
+            y.value += '' + number;
+            this.setState({ y });
+        }
     };
 
     handleEvaluation = async () => {
-        if (this.state.result.x === '' || this.state.result.operator === '' || this.state.result.y === '')
-            return;
-        
-        let requestString = this.state.result.x.trim() + "/" + this.state.result.operator + "/" + this.state.result.y;
-        let result = this.state.result;
+        let {x,y, error, result, operator} = this.state;
 
-        if (this.state.result.x.length > 7 || this.state.result.x.length > 7) {
-            result = this.returnEmptyResult();
-            result.error = "Overflow : max. length 7"
-            this.setState({ result });
+        if (x.value === '' || operator === '' || y.value === '')
+            return;
+
+        let requestString = x.sign + x.value + "/" + operator + "/" + y.sign + y.value;
+
+        if (x.value.split('.')[0].length > 7 || y.value.split('.')[0].length > 7) {
+            ({ x, y, error, result, operator } = this.returnEmptyStates());
+            error = "Overflow : max. length 7"
+            this.setState({ x, y, error, result, operator });
             return;
         }
 
-        let error = false;
+        let httpError = false;
         await fetch('/' + requestString)
             .then(response => {
-                if (response.status !== 200) error = true;
+                if (response.status !== 200) httpError = true;
                 return response.json();
             }
             )
             .then(m => {
-                if (error) {
-                    result = this.returnEmptyResult();
-                    result.error = '' + m.message;
+                if (httpError) {
+                    ({ x, y, error, result, operator } = this.returnEmptyStates());
+                    error = '' + m.message;
                 } else {
-                    result.value = '' + m;
-                    result.x = '';
-                    result.y = '';
-                    result.operator = '';
-                    this.setState({ result });
+                    result.value = ('' + m).replace('-', '');
+                    result.sign = ('' + m)[0] === '-' ? '-' : '+';
+
+                    x.value = '';
+                    y.value = '';
+                    operator = '';
                 }
-                this.setState({ result });
+                this.setState({ x, y, error, result, operator });
             });
     };
 
-    handleOperation = async (operator) => {
-        if (this.state.result.x !== '' && this.state.result.y === '') {
-            let result = this.state.result;
-            result.operator = operator;
-            this.setState({ result });
+    handleOperation = async (operatorInput) => {
+        let { x, y, operator, result } = this.state;
+
+        if (x.value !== '' && y.value === '') {
+            operator = operatorInput;
+            this.setState({ operator });
             return;
         }
 
-        if (this.state.result.x !== '' && this.state.result.operator !== '' && this.state.result.y !== '') {
+        if (x.value !== '' && operator !== '' && y.value !== '') {
             await this.handleEvaluation();
         }
            
         
-        if (this.state.result.value !== '') {
-            let result = this.state.result;
-            result.operator = operator;
-            result.x = result.value;
-            result.y = '';
-            result.value = '';
-            this.setState({ result });
-        }
-        
+        if (result.value !== '') {
+            operator = operatorInput;
+            x = result;
+            y = { sign: '+', value: '' };
+            result = { sign: '+', value: '' };
+            
+            this.setState({ operator, x, y, result });
+        }  
     };
 }
  
