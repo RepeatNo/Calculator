@@ -1,15 +1,30 @@
-### Simple Calculator
+# Simple Calculator
 
-Goals: 
+## Goals:
+
 - Learn React
 - Learn Spring Boot
 
-Backend: 
+## Backend:
+
 - Spring Boot
 - Lombok
 - Maven
+- Hibernate
+- MYSQL
 
-Frontend: 
+## Frontend:
+
 - React
 - Bootstrap (CSS - Libary)
 - Jest (JS Unit-Testing)
+- Node
+- NPM
+
+## Communication between frontend and backend:
+
+- HTTP Method: GET
+- HTTP Requests Example:
+  - http://{ip}/{**number**}/{**operation**}/{**number**}
+  - http://{ip}/{**float**}/{**+**|**-**|**:**|**x**}/{**float**}
+  - http://{ip}/**-4**/**:**/**14.2**
