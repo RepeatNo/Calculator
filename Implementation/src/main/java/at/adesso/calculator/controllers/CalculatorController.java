@@ -45,7 +45,7 @@ public class CalculatorController {
     }
 
     @GetMapping("/{x}/:/{y}")
-    Float divideFloat(@PathVariable Float x, @PathVariable Float y) {
+    Float divideFloat(@PathVariable Float x, @PathVariable Float y) throws DivisionByZeroException {
         log.info("Divided: " + x + ";" + y);
         return calculatorService.divide(x, y);
     }
