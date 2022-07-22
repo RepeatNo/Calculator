@@ -4,6 +4,7 @@ import ResultField from './Fields/resultField.jsx';
 import NumberField from './Fields/numberField.jsx';
 import ClearField from './Fields/clearField.jsx';
 import EvaluationField from './Fields/evaluationField.jsx';
+import CommaField from './Fields/commaField.jsx';
 
 class Calculator extends Component {
     state = {
@@ -63,9 +64,22 @@ class Calculator extends Component {
                     <OperationField value={'x'} onOperation={this.handleOperation} />
                     <EvaluationField value={'='} onEvaluation={this.handleEvaluation} />
                 </div>
+                <div className="row">
+                    <div className="col-3"></div>
+                    <div className="col-3"></div>
+                    <div className="col-3"></div>
+                    <CommaField value={'.'} onComma={this.handleComma} />
+                </div>
             </div>
         );
     };
+
+    handleComma = () => {
+        let { x, y, operator, value, error } = this.state.result; 
+
+        if (y == '' && operator == '')
+            x += x + '.';
+    }
 
     handleClear = () => {
         this.setState({
@@ -79,35 +93,46 @@ class Calculator extends Component {
         });
     };
 
+    returnEmptyResult = () => {
+        return {
+            x: '',
+            y: '',
+            operator: '',
+            value: '',
+            error: ''
+            
+        }
+    };
+
     handleNumber = (number) => {
         let result = this.state.result;
         if (result.error !== '') {
             result.error = '';
         }
         
-        if (this.state.result.y === '' && this.state.result.operator === '') {
-            if (this.state.result.x === '0' && number === 0)
+        if (result.x === '' && result.operator === '') {
+            if (result.x === '0' && number === 0)
                 return;
             
-            if (this.state.result.x === '0' && number !== 0) {
+            if (result.x === '0' && number !== 0) {
                 result.x = '' + number;
                 this.setState({ result });
                 return;
             }
             
-            result.x = this.state.result.x + '' + number;
+            result.x += '' + number;
             this.setState({ result });
         } else {
-            if (this.state.result.y === '0' && number === 0)
+            if (result.y === '0' && number === 0)
                 return;
             
-            if (this.state.result.y === '0' && number !== 0) {
+            if (result.y === '0' && number !== 0) {
                 result.x = '' + number;
                 this.setState({ result });
                 return;
             }
             
-            result.y = this.state.result.y + '' + number;
+            result.y += '' + number;
             this.setState({ result });
         }
 
@@ -120,10 +145,9 @@ class Calculator extends Component {
         
         let requestString = this.state.result.x.trim() + "/" + this.state.result.operator + "/" + this.state.result.y;
         let result = this.state.result;
-        
-        console.log(this.state.result.x.length);
 
         if (this.state.result.x.length > 7 || this.state.result.x.length > 7) {
+            result = this.returnEmptyResult();
             result.error = "Overflow : max. length 7"
             this.setState({ result });
             return;
@@ -138,8 +162,7 @@ class Calculator extends Component {
             )
             .then(m => {
                 if (error) {
-                    this.handleClear();
-                    result = this.state.result;
+                    result = this.returnEmptyResult();
                     result.error = '' + m.message;
                 } else {
                     result.value = '' + m;
