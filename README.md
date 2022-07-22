@@ -23,8 +23,8 @@
 
 ## Communication between frontend and backend:
 
-- HTTP Method: GET
-- HTTP Requests Example:
+- HTTP method: GET
+- HTTP requests example:
   - http://{ip}/{**number**}/{**operation**}/{**number**}
   - http://{ip}/{**float**}/{**+**|**-**|**:**|**x**}/{**float**}
   - http://{ip}/**-4**/**:**/**14.2**
