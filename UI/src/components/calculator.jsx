@@ -16,27 +16,6 @@ class Calculator extends Component {
         error: ''
     };
 
-    dynamicDisplay = () => {
-        let { x, y, operator, error, result } = this.state;
-
-        const dynamicString = (
-            ((x.value !== '')  ? ((x.sign !== '+') ? x.sign : '') + x.value : '') +
-            ((operator !== '') ? " " + operator + ' ' : '') +
-            ((y.value !== '')  ? ((y.sign !== '+') ? y.sign : '') + y.value : '')
-        );
-        
-        if (error != '')
-            return error;
-        
-        if (result.value != '')
-            return ((result.sign !== '+') ? result.sign : '') + result.value;
-        
-        if (dynamicString === '')
-            return '???';
-        
-        return dynamicString;
-    };
-
     render() {
         return (
             <div className="container w-50 text-center ">
@@ -74,6 +53,27 @@ class Calculator extends Component {
                 </div>
             </div>
         );
+    };
+
+    dynamicDisplay = () => {
+        let { x, y, operator, error, result } = this.state;
+
+        const dynamicString = (
+            ((x.value !== '')  ? ((x.sign !== '+') ? x.sign : '') + x.value : '') +
+            ((operator !== '') ? " " + operator + ' ' : '') +
+            ((y.value !== '')  ? ((y.sign !== '+') ? y.sign : '') + y.value : '')
+        );
+        
+        if (error != '')
+            return error;
+        
+        if (result.value != '')
+            return ((result.sign !== '+') ? result.sign : '') + result.value;
+        
+        if (dynamicString === '')
+            return '???';
+        
+        return dynamicString;
     };
 
     handleSignChange = () => {
