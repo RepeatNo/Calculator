@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  backend:
+    image: calc-backend
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysqldb
+  mysqldb:
+    image: "mysql:latest"
+    restart: always
+    ports:
+      - 3308:3306
+    environment:
+      MYSQL_DATABASE: calculator
+      MYSQL_USER: calculator
+      MYSQL_PASSWORD: calculator
+      MYSQL_ROOT_PASSWORD: calculator
+  frontend:
+    container_name: frontend
+    image: calc-frontend
+    volumes:
+      - './:/app'
+      - '/app/node_modules'
+    ports:
+      - 3000:3000
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm start
