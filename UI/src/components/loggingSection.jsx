@@ -42,7 +42,6 @@ class LoggingSection extends Component {
             .then(response => response.json())
             .then(m => {
                 let logs = m;
-                console.log(logs);
                 this.setState({ logs });
             });
     }
