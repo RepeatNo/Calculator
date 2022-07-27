@@ -38,4 +38,9 @@ public class CalculatorImpl implements Calculator {
         }
         return x / y;
     }
+
+    @Override
+    public Float modulo(Float x, Float y) {
+        return x % y;
+    }
 }

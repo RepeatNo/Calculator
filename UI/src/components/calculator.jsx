@@ -43,13 +43,17 @@ class Calculator extends Component {
                 <div className="row">
                     <NumberField value={0} onNumber={this.handleNumber} />
                     <ClearField value={'clear'} onClear={this.handleClear} />
+                    <OperationField value={'%'} onOperation={this.handleOperation} />
                     <OperationField value={'x'} onOperation={this.handleOperation} />
-                    <EvaluationField value={'='} onEvaluation={this.handleEvaluation} />
+                                    
+
+                    
                 </div>
                 <div className="row">
-                    <div className="col-9"></div>
-                    <SignField value={'+/-'} onSignChange={this.handleSignChange} />
+                    <div className='col btn btn-sm m-1'></div>
                     <CommaField value={'.'} onComma={this.handleComma} />
+                    <SignField value={'+/-'} onSignChange={this.handleSignChange} />
+                    <EvaluationField value={'='} onEvaluation={this.handleEvaluation} />
                 </div>
             </div>
         );
@@ -179,8 +183,10 @@ class Calculator extends Component {
 
         if (x.value === '' || operator === '' || y.value === '')
             return;
-
-        let requestString = x.sign + x.value + "/" + operator + "/" + y.sign + y.value;
+       
+        let requestString = x.sign + x.value + "/"
+            + ((operator === '%') ? operator + "25" : operator)
+            + "/" + y.sign + y.value;
 
         if (x.value.split('.')[0].length > 7 || y.value.split('.')[0].length > 7) {
             ({ x, y, error, result, operator } = this.returnEmptyStates());

@@ -43,4 +43,10 @@ public class CalculatorService implements Calculator {
         loggingService.log(x, y, result, OperationType.DIVIDE, LoggingType.INFO);
         return result;
     }
+
+    public Float modulo(Float x, Float y) {
+        Float result = calculator.modulo(x, y);
+        loggingService.log(x, y, result, OperationType.MODULO, LoggingType.INFO);
+        return result;
+    }
 }

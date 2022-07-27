@@ -27,26 +27,32 @@ public class CalculatorController {
     }
 
     @GetMapping("/{x}/+/{y}")
-    ResponseEntity<Float> addFloat(@PathVariable Float x, @PathVariable Float y) {
+    ResponseEntity<Float> add(@PathVariable Float x, @PathVariable Float y) {
         log.info("Added: " + x + ";" + y);
         return ResponseEntity.ok(calculatorService.add(x, y));
     }
 
     @GetMapping("/{x}/-/{y}")
-    ResponseEntity<Float> subtractFloat(@PathVariable Float x, @PathVariable Float y) {
+    ResponseEntity<Float> subtract(@PathVariable Float x, @PathVariable Float y) {
         log.info("Subtracted: " + x + ";" + y);
         return ResponseEntity.ok(calculatorService.subtract(x, y));
     }
 
     @GetMapping("/{x}/x/{y}")
-    ResponseEntity<Float> multiplyFloat(@PathVariable Float x, @PathVariable Float y) {
+    ResponseEntity<Float> multiply(@PathVariable Float x, @PathVariable Float y) {
         log.info("Multiplied: " + x + ";" + y);
         return ResponseEntity.ok(calculatorService.multiply(x, y));
     }
 
     @GetMapping("/{x}/:/{y}")
-    Float divideFloat(@PathVariable Float x, @PathVariable Float y) throws DivisionByZeroException {
+    Float divide(@PathVariable Float x, @PathVariable Float y) throws DivisionByZeroException {
         log.info("Divided: " + x + ";" + y);
         return calculatorService.divide(x, y);
+    }
+
+    @GetMapping("/{x}/%/{y}")
+    Float modulo(@PathVariable Float x, @PathVariable Float y) {
+        log.info("Modulo: " + x + ";" + y);
+        return calculatorService.modulo(x, y);
     }
 }
