@@ -44,7 +44,6 @@ public class CalculatorService implements Calculator {
         return result;
     }
 
-    @Override
     public Float modulo(Float x, Float y) {
         Float result = calculator.modulo(x, y);
         loggingService.log(x, y, result, OperationType.MODULO, LoggingType.INFO);
