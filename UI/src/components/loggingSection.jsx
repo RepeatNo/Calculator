@@ -7,8 +7,8 @@ class LoggingSection extends Component {
     }
     render() { 
         return (
-            <section className="row mt-5">
-                <div className="col-10">
+            <section className="row m-5">
+                <div className="col-12">
                     <table className="table table-dark">
                         <thead>
                             <tr>
@@ -32,7 +32,7 @@ class LoggingSection extends Component {
                         </tbody>
                     </table>
                 </div>
-                <button className="btn col-1 btn-primary btn-small" onClick={() => this.fetchLogs(5)}>Refresh</button>
+                <button className="btn btn-primary btn-small" onClick={() => this.fetchLogs(5)}>Refresh</button>
             </section>
         );
     }
