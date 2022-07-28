@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import OperationField from './Fields/operationField.jsx';
-import ResultField from './Fields/resultField.jsx';
 import NumberField from './Fields/numberField.jsx';
 import ClearField from './Fields/clearField.jsx';
 import EvaluationField from './Fields/evaluationField.jsx';
 import CommaField from './Fields/commaField.jsx';
 import SignField from './Fields/signField.jsx';
+import StoreField from './Fields/storeField.jsx';
+import FractionField from './Fields/fractionField.jsx';
 
 class Calculator extends Component {
     state = {
@@ -13,46 +14,78 @@ class Calculator extends Component {
         y: { sign: '+', value: '' },
         operator: '',
         result: { sign: '+', value: '' },
-        error: ''
+        error: '',
+
+        storage: [
+            { name: 'Storage-1', value: '' },
+            { name: 'Storage-2', value: '' },
+            { name: 'Storage-3', value: '' },
+            { name: 'Storage-4', value: '' },
+            { name: 'Storage-5', value: '' }
+        ]
+    };
+
+    renderStorage = (number) => {
+        return (this.state.storage[number].value === '') ? this.state.storage[number].name : this.state.storage[number].value
     };
 
     render() {
         return (
-            <div className="container w-50 text-center ">
+            <div className="container col text-center">
+                {/*
+                    <div className="row col-6 justify-content-center align-items-center">
+                        <div className="col">
+                            <div className="border-bottom border-primary">12</div>
+                            <div>4</div>
+                        </div>
+                        <div className="col">
+                            x
+                        </div>
+                        <div className="col">
+                            <div className="border-bottom border-primary">3</div>
+                            <div>4</div>
+                        </div>
+                    </div> 
+                */}
+                <div className="row text-end font-monospace" style={{ fontSize: "25px" }}>
+                    <div>
+                        {this.dynamicDisplay()}
+                    </div>
+                </div>
                 <div className="row">
-                    <ResultField displayData={this.dynamicDisplay()} />
+                    <StoreField value={this.renderStorage(0)} index={0} onStore={this.handleStore} />
+                    <StoreField value={this.renderStorage(1)} index={1} onStore={this.handleStore} />
+                    <StoreField value={this.renderStorage(2)} index={2} onStore={this.handleStore} />
+                    <StoreField value={this.renderStorage(3)} index={3} onStore={this.handleStore} />
+                    <StoreField value={this.renderStorage(4)} index={4} onStore={this.handleStore} />
                 </div>
                 <div className="row">
                     <NumberField value={7} onNumber={this.handleNumber} />
                     <NumberField value={8} onNumber={this.handleNumber} />
                     <NumberField value={9} onNumber={this.handleNumber} />
-                    <OperationField value={'+'} onOperation={this.handleOperation} />
+                    <FractionField value2={'÷'} onFraction={this.handleFraction} />
+                    <OperationField value={'%'} onOperation={this.handleOperation} />
                 </div>
                 <div className="row">
                     <NumberField value={4} onNumber={this.handleNumber} />
                     <NumberField value={5} onNumber={this.handleNumber} />
                     <NumberField value={6} onNumber={this.handleNumber} />
-                    <OperationField value={'-'} onOperation={this.handleOperation} />
+                    <OperationField value={':'} onOperation={this.handleOperation} />
+                    <OperationField value={'x'} onOperation={this.handleOperation} />
+                    
                 </div>
                 <div className="row">
                     <NumberField value={1} onNumber={this.handleNumber} />
                     <NumberField value={2} onNumber={this.handleNumber} />
                     <NumberField value={3} onNumber={this.handleNumber} />
-                    <OperationField value={':'} onOperation={this.handleOperation} />
+                    <OperationField value={'-'} onOperation={this.handleOperation} />
+                    <OperationField value={'+'} onOperation={this.handleOperation} />
                 </div>
                 <div className="row">
-                    <NumberField value={0} onNumber={this.handleNumber} />
-                    <ClearField value={'clear'} onClear={this.handleClear} />
-                    <OperationField value={'%'} onOperation={this.handleOperation} />
-                    <OperationField value={'x'} onOperation={this.handleOperation} />
-                                    
-
-                    
-                </div>
-                <div className="row">
-                    <div className='col btn btn-sm m-1'></div>
-                    <CommaField value={'.'} onComma={this.handleComma} />
                     <SignField value={'+/-'} onSignChange={this.handleSignChange} />
+                    <NumberField value={0} onNumber={this.handleNumber} />
+                    <CommaField value={'.'} onComma={this.handleComma} />
+                    <ClearField value={'clear'} onClear={this.handleClear} />
                     <EvaluationField value={'='} onEvaluation={this.handleEvaluation} />
                 </div>
             </div>
@@ -68,23 +101,51 @@ class Calculator extends Component {
             ((y.value !== '')  ? ((y.sign !== '+') ? y.sign : '') + y.value : '')
         );
         
-        if (error != '')
+        if (error !== '')
             return error;
         
-        if (result.value != '')
+        if (result.value !== '')
             return ((result.sign !== '+') ? result.sign : '') + result.value;
         
         if (dynamicString === '')
-            return '???';
+            return '0';
         
         return dynamicString;
+    };
+
+    handleStore = (index) => {
+        let { x, y, storage } = this.state;
+
+        //Return value
+        if (storage[index].value !== '') {
+            if (this.state.y.value === '' && this.state.operator !== '' && this.state.x.value !== '') {
+                y.value = "" + storage[index].value;
+                
+            } else {
+                if (this.state.x.value === '') {
+                    x.value = "" + storage[index].value;
+                }
+            }
+            storage[index].value = "";
+        } else {
+            //Store value
+            if (this.state.y.value !== '') {
+                storage[index].value = this.state.y.value;
+            } else {
+                if (this.state.x !== '') {
+                    storage[index].value = this.state.x.value;
+                }
+            }
+        }
+        this.setState({ x, y, storage });
     };
 
     handleSignChange = () => {
         let { x, y, operator, result } = this.state;
 
         if (result.value !== '') {
-            x = result;
+            x = { ...result };
+            result = { sign: '+', value: '' }
         }
 
         if (y.value === '' && operator === '') {
@@ -95,18 +156,18 @@ class Calculator extends Component {
             y.sign = (y.sign === '+') ? '-' : '+';
         }
 
-        this.setState({ x, y });        
+        this.setState({ x, y, result });
     };
 
     handleComma = () => {
         let state = this.state;
 
         if (state.result.value !== '') {
-            state.x = state.result;
+            state.x = { ...state.result };
             state.result = { sign: '+', value: '' };
         }
 
-        if (state.y.value == '' && state.operator == '' && !state.x.value.includes("."))
+        if (state.y.value === '' && state.operator === '' && !state.x.value.includes("."))
             state.x.value += '.';
         else {
             if (state.x.value !== '' && state.operator !== '' && !state.y.value.includes(".")) {
@@ -118,13 +179,19 @@ class Calculator extends Component {
     }
 
     handleClear = () => {
-        this.setState({
-            x: { sign: '+', value: '' },
-            y: { sign: '+', value: '' },
-            operator: '',
-            result: { sign: '+', value: '' },
-            error: ''
-        });
+        if (this.state.y.value !== '') {
+            this.setState({
+                y: { sign: '+', value: '' }
+            });
+        } else {
+            this.setState({
+                x: { sign: '+', value: '' },
+                y: { sign: '+', value: '' },
+                operator: '',
+                result: { sign: '+', value: '' },
+                error: ''
+            });
+        }
     };
 
     returnEmptyStates = () => {
@@ -234,7 +301,7 @@ class Calculator extends Component {
         
         if (result.value !== '') {
             operator = operatorInput;
-            x = result;
+            x = { ...result };
             y = { sign: '+', value: '' };
             result = { sign: '+', value: '' };
             
