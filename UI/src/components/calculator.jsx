@@ -7,49 +7,37 @@ import CommaField from './Fields/commaField.jsx';
 import SignField from './Fields/signField.jsx';
 import StoreField from './Fields/storeField.jsx';
 import FractionField from './Fields/fractionField.jsx';
+import Result from './Result.jsx';
 
 class Calculator extends Component {
     state = {
-        x: { sign: '+', value: '' },
-        y: { sign: '+', value: '' },
+        x: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
+        y: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
         operator: '',
-        result: { sign: '+', value: '' },
+        result: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
         error: '',
 
         storage: [
-            { name: 'Storage-1', value: '' },
-            { name: 'Storage-2', value: '' },
-            { name: 'Storage-3', value: '' },
-            { name: 'Storage-4', value: '' },
-            { name: 'Storage-5', value: '' }
+            { name: 'Storage-1', data: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } } },
+            { name: 'Storage-2', data: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } } },
+            { name: 'Storage-3', data: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } } },
+            { name: 'Storage-4', data: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } } },
+            { name: 'Storage-5', data: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } } }
         ]
     };
 
     renderStorage = (number) => {
-        return (this.state.storage[number].value === '') ? this.state.storage[number].name : this.state.storage[number].value
+        return (this.state.storage[number].data.value === '') ? this.state.storage[number].name : this.renderNumber(this.state.storage[number].data)
     };
+
+    returnState = () => { return this.state; }
 
     render() {
         return (
             <div className="container col text-center">
-                {/*
-                    <div className="row col-6 justify-content-center align-items-center">
-                        <div className="col">
-                            <div className="border-bottom border-primary">12</div>
-                            <div>4</div>
-                        </div>
-                        <div className="col">
-                            x
-                        </div>
-                        <div className="col">
-                            <div className="border-bottom border-primary">3</div>
-                            <div>4</div>
-                        </div>
-                    </div> 
-                */}
                 <div className="row text-end font-monospace" style={{ fontSize: "25px" }}>
                     <div>
-                        {this.dynamicDisplay()}
+                        <Result state={this.state} />
                     </div>
                 </div>
                 <div className="row">
@@ -63,7 +51,7 @@ class Calculator extends Component {
                     <NumberField value={7} onNumber={this.handleNumber} />
                     <NumberField value={8} onNumber={this.handleNumber} />
                     <NumberField value={9} onNumber={this.handleNumber} />
-                    <FractionField value2={'÷'} onFraction={this.handleFraction} />
+                    <FractionField value={'÷'} onFraction={this.handleFraction} />
                     <OperationField value={'%'} onOperation={this.handleOperation} />
                 </div>
                 <div className="row">
@@ -92,52 +80,59 @@ class Calculator extends Component {
         );
     };
 
-    dynamicDisplay = () => {
-        let { x, y, operator, error, result } = this.state;
+    handleFraction = () => {
+        let { x, y, operator, result } = this.state;
 
-        const dynamicString = (
-            ((x.value !== '')  ? ((x.sign !== '+') ? x.sign : '') + x.value : '') +
-            ((operator !== '') ? " " + operator + ' ' : '') +
-            ((y.value !== '')  ? ((y.sign !== '+') ? y.sign : '') + y.value : '')
-        );
-        
-        if (error !== '')
-            return error;
-        
-        if (result.value !== '')
-            return ((result.sign !== '+') ? result.sign : '') + result.value;
-        
-        if (dynamicString === '')
-            return '0';
-        
-        return dynamicString;
-    };
+        if (result.value !== '') {
+            x = { ...result };
+            result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
+        }
+
+        if (y.value === '' && operator === '') {
+            x.denominator.active = !x.denominator.active;
+        } else {
+            if (operator !== '') {
+                y.denominator.active = !y.denominator.active;
+            }
+        }
+
+        this.setState({ x, y, result });
+    }
 
     handleStore = (index) => {
-        let { x, y, storage } = this.state;
+        let { x, y, storage, result, operator } = this.state;
+
+        if (result.value !== '') {
+            x = { ...result };
+            result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
+        }
 
         //Return value
-        if (storage[index].value !== '') {
-            if (this.state.y.value === '' && this.state.operator !== '' && this.state.x.value !== '') {
-                y.value = "" + storage[index].value;
+        if (storage[index].data.value !== '') {
+            if (operator !== '' && x.value !== '') {
+                y = { ...storage[index].data };
                 
             } else {
-                if (this.state.x.value === '') {
-                    x.value = "" + storage[index].value;
+                if (operator === '' && y.value === '') {
+                    x = { ...storage[index].data };
                 }
             }
-            storage[index].value = "";
+            storage[index].data = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } };
         } else {
             //Store value
-            if (this.state.y.value !== '') {
-                storage[index].value = this.state.y.value;
+            if (y.value !== ''
+                && ((y.denominator.active === true && y.denominator.value !== '')
+                    || y.denominator.active === false)) {
+                storage[index].data = { ...y };
             } else {
-                if (this.state.x !== '') {
-                    storage[index].value = this.state.x.value;
+                if (x.value !== '' && y.value === ''
+                    && ((x.denominator.active === true && x.denominator.value !== '')
+                        || x.denominator.active === false)) {
+                    storage[index].data = { ...x };
                 }
             }
         }
-        this.setState({ x, y, storage });
+        this.setState({ x, y, storage, result, operator });
     };
 
     handleSignChange = () => {
@@ -145,15 +140,23 @@ class Calculator extends Component {
 
         if (result.value !== '') {
             x = { ...result };
-            result = { sign: '+', value: '' }
+            result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
         }
 
         if (y.value === '' && operator === '') {
-            x.sign = (x.sign === '+') ? '-' : '+';
+            if (x.denominator.active) {
+                x.denominator.sign = (x.denominator.sign === '+') ? '-' : '+';
+            } else {
+                x.sign = (x.sign === '+') ? '-' : '+';
+            }
         }
 
         if (operator !== '' && y.value !== '') {
-            y.sign = (y.sign === '+') ? '-' : '+';
+           if (y.denominator.active) {
+                y.denominator.sign = (y.denominator.sign === '+') ? '-' : '+';
+            } else {
+                y.sign = (y.sign === '+') ? '-' : '+';
+            }
         }
 
         this.setState({ x, y, result });
@@ -164,31 +167,39 @@ class Calculator extends Component {
 
         if (state.result.value !== '') {
             state.x = { ...state.result };
-            state.result = { sign: '+', value: '' };
+            state.result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } };
         }
 
         if (state.y.value === '' && state.operator === '' && !state.x.value.includes("."))
-            state.x.value += '.';
+            if (state.x.value === '') {
+                state.x.value = '0.';
+            } else {
+                state.x.value += '.';
+            }
         else {
             if (state.x.value !== '' && state.operator !== '' && !state.y.value.includes(".")) {
-                state.y.value += '.'
+                if (state.y.value === '') {
+                    state.y.value = '0.';
+                } else {
+                    state.y.value += '.';
+                }
             }
         }
         
         this.setState(state);
-    }
+    };
 
     handleClear = () => {
         if (this.state.y.value !== '') {
             this.setState({
-                y: { sign: '+', value: '' }
+                y: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
             });
         } else {
             this.setState({
-                x: { sign: '+', value: '' },
-                y: { sign: '+', value: '' },
+                x: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
+                y: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
                 operator: '',
-                result: { sign: '+', value: '' },
+                result: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
                 error: ''
             });
         }
@@ -196,10 +207,10 @@ class Calculator extends Component {
 
     returnEmptyStates = () => {
         return {
-            x: { sign: '+', value: '' },
-            y: { sign: '+', value: '' },
+            x: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
+            y: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
             operator: '',
-            result: { sign: '+', value: '' },
+            result: { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } },
             error: ''
         }
     };
@@ -212,9 +223,8 @@ class Calculator extends Component {
             this.setState({ error });
         }
 
-        if (result !== '') {
-            result.value = '';
-            result.sign = '+';
+        if (result.value !== '') {
+            result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
             this.setState({ result });
         }
         
@@ -227,20 +237,47 @@ class Calculator extends Component {
                 this.setState({ x });
                 return;
             }
+
+            if (x.value === '0' && number === 0)
+                return;
             
-            x.value += '' + number;
+            if (x.value === '0' && number !== 0) {
+                x.value = '' + number;
+                this.setState({ x });
+                return;
+            }
+            
+            if (x.denominator.active === true) {
+                x.denominator.value += '' + number;
+            } else {
+                x.value += '' + number;
+            }
+            
             this.setState({ x });
         } else {
             if (y.value === '0' && number === 0)
                 return;
             
             if (y.value === '0' && number !== 0) {
-                x.value = '' + number;
-                this.setState({ x });
+                y.value = '' + number;
+                this.setState({ y });
+                return;
+            }
+
+            if (y.denominator.value === '0' && number === 0)
+                return;
+            
+            if (y.denominator.value === '0' && number !== 0) {
+                y.denominator.value = '' + number;
+                this.setState({ y });
                 return;
             }
             
-            y.value += '' + number;
+            if (y.denominator.active === true) {
+                y.denominator.value += '' + number;
+            } else {
+                y.value += '' + number;
+            }
             this.setState({ y });
         }
     };
@@ -251,6 +288,17 @@ class Calculator extends Component {
         if (x.value === '' || operator === '' || y.value === '')
             return;
        
+        if (x.denominator.active === true) {
+            let tmp = await this.calculateFraction(x);
+            x = { ...tmp };
+        }
+            
+        
+        if (y.denominator.active === true){
+            let tmp = await this.calculateFraction(y);
+            y = { ...tmp };
+        }
+        
         let requestString = x.sign + x.value + "/"
             + ((operator === '%') ? operator + "25" : operator)
             + "/" + y.sign + y.value;
@@ -277,13 +325,44 @@ class Calculator extends Component {
                     result.value = ('' + m).replace('-', '');
                     result.sign = ('' + m)[0] === '-' ? '-' : '+';
 
-                    x.value = '';
-                    y.value = '';
+                    x = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
+                    y = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
                     operator = '';
                 }
                 this.setState({ x, y, error, result, operator });
             });
     };
+
+    calculateFraction = async (number) => {
+        let { x, y, error, result, operator } = this.state;
+        
+        let requestString = number.sign + number.value + "/"
+            + ":"
+            + "/" + number.denominator.sign + number.denominator.value;
+        
+        let httpError = false;
+        await fetch('/' + requestString)
+            .then(response => {
+                if (response.status !== 200) httpError = true;
+                return response.json();
+            }
+            )
+            .then(m => {
+                if (httpError) {
+                    ({ x, y, error, result, operator } = this.returnEmptyStates());
+                    error = '' + m.message;
+                    this.setState({ x, y, error, result, operator });
+                    return null;
+                } else {
+                    number = {
+                        sign: ('' + m)[0] === '-' ? '-' : '+',
+                        value: ('' + m).replace('-', ''),
+                        denominator: { sign: '+', value: '', active: false }
+                    }
+                }
+            });
+        return number;
+    }
 
     handleOperation = async (operatorInput) => {
         let { x, y, operator, result } = this.state;
@@ -302,11 +381,26 @@ class Calculator extends Component {
         if (result.value !== '') {
             operator = operatorInput;
             x = { ...result };
-            y = { sign: '+', value: '' };
-            result = { sign: '+', value: '' };
+            y = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } };
+            result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } };
             
             this.setState({ operator, x, y, result });
         }  
+    };
+
+    renderValue = (object) => {
+        return (object.value === '') ? "[ ]" : "" + ((object.sign === '+') ? '' : '-') + object.value
+    };
+
+    renderNumber = (number) => {
+        if (number.value === '')
+            return "";
+        if (number.denominator.active === false) {
+            return (
+                this.renderValue(number)
+            )
+        }
+        return (this.renderValue(number) + "/" + this.renderValue(number.denominator));
     };
 }
  
