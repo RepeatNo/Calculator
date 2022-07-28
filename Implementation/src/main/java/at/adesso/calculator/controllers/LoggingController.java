@@ -26,8 +26,7 @@ public class LoggingController {
     ResponseEntity<List<CalculationOperationLog>> getLogging(@PathVariable int count) {
         return ResponseEntity.ok(
                 calculationOperationLogRepository
-                        .findAllByIdIsNotNullOrderByIdDesc
-                                ()
+                        .findAllByIdIsNotNullOrderByIdDesc()
                         .stream()
                         .limit(count)
                         .collect(Collectors.toList())

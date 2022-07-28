@@ -35,32 +35,32 @@ class CalculatorControllerTest {
     CalculatorController calculatorController;
 
     @Test
-    public void addFloatTest() {
+    public void addTest() {
         when(calculatorService.add(1f, 2f)).thenReturn(5f);
-        assertEquals(5f, calculatorController.addFloat(1f, 2f));
+        assertEquals(5f, calculatorController.add(1f, 2f));
     }
 
     @Test
-    public void subtractFloatTest() {
+    public void subtractTest() {
         when(calculatorService.subtract(1f, 2f)).thenReturn(3f);
-        assertEquals(3f, calculatorController.subtractFloat(1f, 2f));
+        assertEquals(3f, calculatorController.subtract(1f, 2f));
     }
 
     @Test
-    public void divideFloatTest() throws DivisionByZeroException {
+    public void divideTest() throws DivisionByZeroException {
         when(calculatorService.divide(5f, 2.5f)).thenReturn(2f);
-        assertEquals(2f, calculatorController.divideFloat(5f, 2.5f));
+        assertEquals(2f, calculatorController.divide(5f, 2.5f));
     }
 
     @Test
-    public void multiplyFloatTest() {
+    public void multiplyTest() {
         when(calculatorService.multiply(2f, 3f)).thenReturn(6f);
-        assertEquals(6f, calculatorController.multiplyFloat(2f, 3f));
+        assertEquals(6f, calculatorController.multiply(2f, 3f));
     }
 
     //<editor-fold desc="Add">
     @Test
-    public void addFloatStatusOkTest()
+    public void addStatusOkTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -72,7 +72,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void addFloatStatusNotFoundTest()
+    public void addStatusNotFoundTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -84,7 +84,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void addFloatStatusTest()
+    public void addStatusTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -96,7 +96,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    void addFloatMediaTest() throws IOException {
+    void addMediaTest() throws IOException {
         // Given
         String jsonMimeType = "application/json";
         HttpUriRequest request = new HttpGet("http://localhost:8080/add/-1-4");
@@ -112,7 +112,7 @@ class CalculatorControllerTest {
     //</editor-fold>
     //<editor-fold desc="Subtract">
     @Test
-    public void subtractFloatStatusOkTest()
+    public void subtractStatusOkTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -124,7 +124,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void subtractFloatStatusNotFoundTest()
+    public void subtractStatusNotFoundTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -136,7 +136,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void subtractFloatStatusTest()
+    public void subtractStatusTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -148,7 +148,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    void subtractFloatMediaTest() throws IOException {
+    void subtractMediaTest() throws IOException {
         // Given
         String jsonMimeType = "application/json";
         HttpUriRequest request = new HttpGet("http://localhost:8080/add/-1-4");
@@ -164,7 +164,7 @@ class CalculatorControllerTest {
     //<editor-fold desc="Multiply">
 
     @Test
-    public void multiplyFloatStatusOkTest()
+    public void multiplyStatusOkTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -176,7 +176,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void multiplyFloatStatusNotFoundTest()
+    public void multiplyStatusNotFoundTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -188,7 +188,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void multiplyFloatStatusTest()
+    public void multiplyStatusTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -200,7 +200,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    void multiplyFloatMediaTest() throws IOException {
+    void multiplyMediaTest() throws IOException {
         // Given
         String jsonMimeType = "application/json";
         HttpUriRequest request = new HttpGet("http://localhost:8080/subtract/-1-4");
@@ -216,7 +216,7 @@ class CalculatorControllerTest {
     //</editor-fold>
     //<editor-fold desc="Divide">
     @Test
-    public void divideFloatStatusOkTest()
+    public void divideStatusOkTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -228,7 +228,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void divideFloatStatusNotFoundTest()
+    public void divideStatusNotFoundTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -240,7 +240,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    public void divideFloatStatusTest()
+    public void divideStatusTest()
             throws ClientProtocolException, IOException {
 
         // Given
@@ -252,7 +252,7 @@ class CalculatorControllerTest {
     }
 
     @Test
-    void divideFloatMediaTest() throws IOException {
+    void divideMediaTest() throws IOException {
         // Given
         String jsonMimeType = "application/json";
         HttpUriRequest request = new HttpGet("http://localhost:8080/subtract/-1-4");
