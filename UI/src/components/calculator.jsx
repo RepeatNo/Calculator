@@ -111,7 +111,6 @@ class Calculator extends Component {
         if (storage[index].data.value !== '') {
             if (operator !== '' && x.value !== '') {
                 y = { ...storage[index].data };
-                
             } else {
                 if (operator === '' && y.value === '') {
                     x = { ...storage[index].data };
@@ -124,11 +123,13 @@ class Calculator extends Component {
                 && ((y.denominator.active === true && y.denominator.value !== '')
                     || y.denominator.active === false)) {
                 storage[index].data = { ...y };
+                storage[index].data.denominator = { ...y.denominator }
             } else {
                 if (x.value !== '' && y.value === ''
                     && ((x.denominator.active === true && x.denominator.value !== '')
                         || x.denominator.active === false)) {
                     storage[index].data = { ...x };
+                    storage[index].data.denominator = { ...x.denominator }
                 }
             }
         }
@@ -170,22 +171,46 @@ class Calculator extends Component {
             state.result = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } };
         }
 
-        if (state.y.value === '' && state.operator === '' && !state.x.value.includes("."))
-            if (state.x.value === '') {
-                state.x.value = '0.';
+        if (state.y.value === '' && state.operator === '') {
+            if (state.x.denominator.active === false) {
+                if (!state.x.value.includes(".")) {
+                    if (state.x.value === '' && !state.x.value.includes(".")) {
+                        state.x.value = '0.';
+                    } else {
+                        state.x.value += '.';
+                    }
+                }
             } else {
-                state.x.value += '.';
+                if (!state.x.denominator.value.includes(".")) {
+                    if (state.x.denominator.value === '') {
+                        state.x.denominator.value = '0.';
+                    } else {
+                        state.x.denominator.value += '.';
+                    }
+                }
             }
+        }   
         else {
-            if (state.x.value !== '' && state.operator !== '' && !state.y.value.includes(".")) {
-                if (state.y.value === '') {
-                    state.y.value = '0.';
+            if (state.x.value !== '' && state.operator !== '') {
+                if (!state.y.value.includes(".")) {
+                    if (state.y.denominator.active === false) {
+                        if (state.y.value === '') {
+                            state.y.value = '0.';
+                        } else {
+                            state.y.value += '.';
+                        }
+                    }
                 } else {
-                    state.y.value += '.';
+                    if (!state.y.denominator.value.includes(".")) {
+                        if (state.y.denominator.value === '') {
+                            state.y.denominator.value = '0.';
+                        } else {
+                            state.y.denominator.value += '.';
+                        }
+                    }
                 }
             }
         }
-        
         this.setState(state);
     };
 
@@ -283,17 +308,17 @@ class Calculator extends Component {
     };
 
     handleEvaluation = async () => {
-        let {x,y, error, result, operator} = this.state;
+        let { x, y, error, result, operator } = this.state;
+        
+        if (x.denominator.active === true && x.denominator.value !== '' && x.value !== '') {
+            let tmp = await this.calculateFraction(x);
+            x = { ...tmp };
+            this.setState({ x });
+        }
 
         if (x.value === '' || operator === '' || y.value === '')
             return;
-       
-        if (x.denominator.active === true) {
-            let tmp = await this.calculateFraction(x);
-            x = { ...tmp };
-        }
-            
-        
+
         if (y.denominator.active === true){
             let tmp = await this.calculateFraction(y);
             y = { ...tmp };
@@ -351,8 +376,9 @@ class Calculator extends Component {
                 if (httpError) {
                     ({ x, y, error, result, operator } = this.returnEmptyStates());
                     error = '' + m.message;
+                    x = { sign: '+', value: '', denominator: { sign: '+', value: '', active: false } }
                     this.setState({ x, y, error, result, operator });
-                    return null;
+                    return x;
                 } else {
                     number = {
                         sign: ('' + m)[0] === '-' ? '-' : '+',

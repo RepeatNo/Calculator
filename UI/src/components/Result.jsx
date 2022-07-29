@@ -12,7 +12,9 @@ class Result extends Component {
         let { error, result, x, operator, y } = this.props.state;
 
         if (error !== '') {
-            return (this.renderNumber(error));
+            return (<div className="col-auto">
+                <div>{error}</div>
+            </div>);
         }
 
         if (result.value !== '') {
